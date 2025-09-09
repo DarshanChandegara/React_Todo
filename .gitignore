@@ -1,0 +1,71 @@
+# === Root ===
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+logs
+*.log
+debug.log
+
+# === OS Files ===
+*.swp
+*.swo
+
+# === Build output ===
+build/
+temp/
+.cache/
+
+# === Frontend (React) ===
+client/node_modules/
+client/build/
+client/dist/
+client/.env
+client/.env.local
+client/.env.*.local
+client/.cache/
+client/coverage/
+
+# === Backend (Node/Express) ===
+server/node_modules/
+server/dist/
+server/.env
+server/.env.local
+server/.env.*.local
+server/.cache/
+server/coverage/
+
+# === VSCode ===
+.vscode/
+.history/
+
+# === Testing ===
+coverage/
+*.lcov
+
+# === MongoDB dump or data folders ===
+dump/
+data/
+
+# === Optional: PM2 Logs ===
+pids/
+*.pid
+*.seed
+
+# === Optional: Docker ===
+docker-compose.override.yml
+*.tar
+
+# === Optional: OS-related ===
+*.bak
+*.tmp
