@@ -1,8 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-
+const userRoutes = require('./routes/auth');
+const todoRoutes = require('./routes/todos');
 // Load environment variables
 dotenv.config();
 
@@ -10,19 +12,20 @@ const app = express();
 
 // Middleware
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
 // Database connection
-// mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/todolist', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// })
-// .then(() => console.log('MongoDB connected'))
-// .catch(err => console.log(err));
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB Atlas connected'))
+.catch(err => console.log('MongoDB connection error:', err));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/todos', require('./routes/todos'));
+app.use('/api/auth', userRoutes);
+app.use('/api/todos', todoRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
