@@ -1,64 +1,71 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react'
-
-// to get the data from local storage 
-
-const getLocalItems = () => {
-    let tmpData = localStorage.getItem('lists');
-    console.log(tmpData)
-    if (tmpData) {
-        return JSON.parse(localStorage.getItem('lists'));
-    }
-    else {
-        return []
-    }
-}
+import React, { useEffect, useState } from 'react'
+import { todoAPI } from '../services/api'
 
 const Todo = () => {
+    const [data, setData] = useState('')
+    const [list, setList] = useState([])
+    const [toggle, setToggle] = useState(true)
+    const [editId, setEditId] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
 
-    var [data, setData] = useState()
-    var [list, setList] = useState(getLocalItems())
-    var [toggle, setToggle] = useState(true)
-    var [editId, setEditId] = useState(null)
+    // Load todos on component mount
+    useEffect(() => {
+        loadTodos()
+    }, [])
+
+    const loadTodos = async () => {
+        try {
+            setLoading(true)
+            const todos = await todoAPI.getTodos()
+            if (Array.isArray(todos)) {
+                setList(todos)
+            } else {
+                setError('Failed to load todos')
+            }
+        } catch (error) {
+            setError('Failed to load todos')
+            console.error('Error loading todos:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const inEVe = (event) => {
         setData(event.target.value)
     }
 
-    const addItem = () => {
-        if (!data) {
-            alert('Pleas add some data ')
+    const addItem = async () => {
+        if (!data.trim()) {
+            setError('Please add some data')
+            return
         }
-        else if (data && !toggle) {
-            setList(
-                list.map((currData) => {
-                    if (currData.id === editId) {
-                        return { ...currData, name: data }
+
+        try {
+            setError('')
+            if (data && !toggle) {
+                // Update existing todo
+                await todoAPI.updateTodo(editId, { title: data })
+                setList(list.map((currData) => {
+                    if (currData._id === editId) {
+                        return { ...currData, title: data }
                     }
                     return currData
                 }))
-            setData('')
-            setEditId(null)
-            setToggle(true)
-        }
-        else {
-            const actData = {
-                id: new Date().getTime().toString(),
-                name: data
-            };
-            console.log(actData);
-            setList((prevList) => {
-                return [...prevList, actData]
-            })
-            setData('')
+                setData('')
+                setEditId(null)
+                setToggle(true)
+            } else {
+                // Create new todo
+                const newTodo = await todoAPI.createTodo({ title: data })
+                setList((prevList) => [newTodo, ...prevList])
+                setData('')
+            }
+        } catch (error) {
+            setError('Failed to save todo')
+            console.error('Error saving todo:', error)
         }
     }
-
-    // add data to local storage
-
-    useEffect(() => {
-        localStorage.setItem('lists', JSON.stringify(list))
-    }, [list])
 
     // const remove = (event) => {
     //     const id = event.target.id
@@ -72,25 +79,42 @@ const Todo = () => {
 
     // Above function is works fine but in big projects it is not preferable so we use below method 
 
-    const remove = (index) => {
-        console.log('click');
-        const updatedata = list.filter((element) => {
-            return index !== element.id
-        })
-        setList(updatedata)
+    const remove = async (id) => {
+        try {
+            setError('')
+            await todoAPI.deleteTodo(id)
+            const updatedData = list.filter((element) => {
+                return id !== element._id
+            })
+            setList(updatedData)
+        } catch (error) {
+            setError('Failed to delete todo')
+            console.error('Error deleting todo:', error)
+        }
     }
 
-    const edit = (index) => {
-        let newItem = list.find((elem) => {
-            return elem.id === index
+    const edit = (id) => {
+        const itemToEdit = list.find((elem) => {
+            return elem._id === id
         })
         setToggle(false)
-        setData(newItem.name)
-        setEditId(index)
+        setData(itemToEdit.title)
+        setEditId(id)
     }
 
-    const removeAll = () => {
-        setList([])
+    const removeAll = async () => {
+        try {
+            setError('')
+            await todoAPI.deleteAllTodos()
+            setList([])
+        } catch (error) {
+            setError('Failed to delete all todos')
+            console.error('Error deleting all todos:', error)
+        }
+    }
+
+    if (loading) {
+        return <div className='loading'>Loading todos...</div>
     }
 
     return (
@@ -102,10 +126,20 @@ const Todo = () => {
                         <figcaption>Add your list here</figcaption>
                     </figure>
 
+                    {error && <div className='error-message'>{error}</div>}
+
                     <div className='addItems'>
-                        <input type="text" placeholder='✍️ write here' onChange={inEVe} value={data} />
+                        <input
+                            type="text"
+                            placeholder='✍️ write here'
+                            onChange={inEVe}
+                            value={data}
+                            onKeyPress={(e) => e.key === 'Enter' && addItem()}
+                        />
                         {
-                            toggle ? <i className="fa fa-plus add-btn" title='Add Item' onClick={addItem}></i> : <i className='far fa-edit add-btn' title='Edit Item' onClick={addItem}></i>
+                            toggle ?
+                                <i className="fa fa-plus add-btn" title='Add Item' onClick={addItem}></i> :
+                                <i className='far fa-edit add-btn' title='Edit Item' onClick={addItem}></i>
                         }
                     </div>
 
@@ -113,28 +147,25 @@ const Todo = () => {
                         {
                             list.map((currData) => {
                                 return (
-                                    <>
-                                        <div className='eachItem' key={currData.id}>
-                                            {/* <h3 style={{textTransform : 'capitalize'}}>{currData}</h3>
-                                            <i className='far fa-trash-alt add-btn' title='Delete Item' onClick={remove} id={index}></i> */}
-
-                                            {/* Above is for previous way  */}
-
-                                            <h3 style={{ textTransform: 'capitalize' }}>{currData.name}</h3>
-                                            <div className='todo-btn'>
-                                                <i className='far fa-edit add-btn' title='Edit Item' onClick={() => edit(currData.id)}></i>
-                                                <i className='far fa-trash-alt add-btn' title='Delete Item' onClick={() => remove(currData.id)}></i>
-                                            </div>
+                                    <div className='eachItem' key={currData._id}>
+                                        <h3 style={{ textTransform: 'capitalize' }}>{currData.title}</h3>
+                                        <div className='todo-btn'>
+                                            <i className='far fa-edit add-btn' title='Edit Item' onClick={() => edit(currData._id)}></i>
+                                            <i className='far fa-trash-alt add-btn' title='Delete Item' onClick={() => remove(currData._id)}></i>
                                         </div>
-                                    </>
+                                    </div>
                                 )
                             })
                         }
                     </div>
 
-                    <div className='showItems'>
-                        <button className='btn effect04' data-sm-link-text="Remove All" onClick={removeAll}> <span>CHECK LIST</span></button>
-                    </div>
+                    {list.length > 0 && (
+                        <div className='showItems'>
+                            <button className='btn effect04' data-sm-link-text="Remove All" onClick={removeAll}>
+                                <span>CHECK LIST</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </>
