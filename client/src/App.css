@@ -1,3 +1,41 @@
+html, body {
+  height: 100vh;
+  overflow: hidden;
+}
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #23243a;
+  border-radius: 1.2rem;
+  padding: 2.5rem 2rem 2rem 2rem;
+  min-width: 340px;
+  min-height: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  position: relative;
+  z-index: 1001;
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 2.2rem;
+  color: #aaa;
+  cursor: pointer;
+  z-index: 1002;
+}
+.modal-close:hover {
+  color: #e74c3c;
+}
 @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap");
 
 * {
@@ -21,7 +59,7 @@ html {
 
 .child-div {
   text-align: center;
-  margin-top: 12rem;
+  margin-top: 8rem;
 } 
 
 .child-div figure img {
@@ -38,9 +76,7 @@ html {
 
 input {
   /* display: block; */
-  min-width: 40rem;
   height: 3.4rem;
-  padding: 2rem 1.2rem;
   font-size: 1.8rem;
   line-height: 1.42857143;
   margin-top: 2rem;
@@ -110,13 +146,109 @@ input:focus {
   padding: 1.2rem 1rem;
   border-radius: 0.5rem;
   margin-bottom: 0.7rem;
-  margin-left: 1rem;
-  min-width: 40rem;
+  margin-left: 0;
+  min-width: 0;
   word-break: break-word;
   background: rgb(85, 41, 220);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.eachItem h3 {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 1.6rem;
+  color: #fff;
+}
+.addItems-inner {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100%;
+  position: relative;
+  padding: 0 0.5rem 0 0.5rem;
+}
+
+.addItems-inner input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  font-size: 1.6rem;
+  padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.addItems-inner .add-btn {
+  font-size: 2.2rem;
+  color: #6c63ff;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  margin-right: 0.2rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+  align-self: center;
+  transition: color 0.2s;
+}
+
+.addItems-inner .add-btn:hover {
+  color: #4b3cc4;
+}
+.addItems {
+  position: relative;
+  width: 100%;
+  max-width: 44rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+}
+
+.addItems input {
+  width: 100%;
+  padding-right: 3rem;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
+.addItems .add-btn {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.2rem;
+  color: #6c63ff;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  z-index: 2;
+  align-self: center;
+}
+
+.addItems .add-btn:hover {
+  color: #4b3cc4;
+}
+
+.todo-btn {
+  min-width: 5.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .eachItem:hover {
@@ -130,6 +262,53 @@ input:focus {
   color: #fff;
 }
 
+.addItems input {
+  width: 100%;
+  max-width: 40rem;
+  min-width: 25rem;
+  font-size: 1.8rem;
+  padding: 1.2rem 1.5rem;
+  margin-right: 1rem;
+  box-sizing: border-box;
+}
+
+.todo-list-box {
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-bottom: 2rem;
+  margin-top: 1.5rem;
+  padding: 0 0.5rem 1rem 0.5rem;
+  width: 100%;
+  max-width: 44rem;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(30, 30, 60, 0.85);
+  border-radius: 1rem;
+  box-sizing: border-box;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+
+/* Hide scrollbar but allow scroll */
+.todo-list-box::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+.todo-list-box::-webkit-scrollbar-thumb {
+  background: rgba(120,120,160,0.25);
+  border-radius: 8px;
+}
+.todo-list-box:hover::-webkit-scrollbar-thumb {
+  background: rgba(120,120,160,0.45);
+}
+.todo-list-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.todo-list-box {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120,120,160,0.25) transparent;
+}
 .fa-trash-alt,
 .fa-edit {
   /* margin-left: -2.5rem; */
@@ -312,11 +491,16 @@ input:focus {
 /* App Header */
 .app-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 1.2rem 2.5rem 1.2rem 2.5rem;
+  background: #181a2a;
   color: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  min-height: 60px;
+  width: 100%;
+  margin-bottom: 0;
+  border-radius: 0;
 }
 
 .app-header h1 {
@@ -324,14 +508,24 @@ input:focus {
 }
 
 .logout-btn {
-  padding: 0.5rem 1rem;
-  background: rgb(214, 47, 61);
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(90deg, #e74c3c 60%, #c0392b 100%);
   color: #fff;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.8rem;
   cursor: pointer;
-  font-size: 1.4rem;
-  transition: background 0.3s ease;
+  font-size: 1.5rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(231,76,60,0.08);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  outline: none;
+  margin-left: 1rem;
+}
+
+.logout-btn:hover, .logout-btn:focus {
+  background: linear-gradient(90deg, #c0392b 60%, #e74c3c 100%);
+  box-shadow: 0 4px 16px rgba(231,76,60,0.18);
+  transform: translateY(-2px) scale(1.04);
 }
 
 .logout-btn:hover {

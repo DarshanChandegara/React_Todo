@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { todoAPI } from '../services/api'
 
-const Todo = () => {
+import { useRef } from 'react'
+
+const Todo = ({ isAuthenticated, onRequireLogin }) => {
     const [data, setData] = useState('')
     const [list, setList] = useState([])
     const [toggle, setToggle] = useState(true)
     const [editId, setEditId] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const inputRef = useRef(null)
 
     // Load todos on component mount
     useEffect(() => {
-        loadTodos()
-    }, [])
+        if (isAuthenticated) {
+            loadTodos()
+        } else {
+            setList([])
+        }
+    }, [isAuthenticated])
 
     const loadTodos = async () => {
         try {
@@ -20,6 +27,7 @@ const Todo = () => {
             const todos = await todoAPI.getTodos()
             if (Array.isArray(todos)) {
                 setList(todos)
+                setError('')
             } else {
                 setError('Failed to load todos')
             }
@@ -39,6 +47,12 @@ const Todo = () => {
         if (!data.trim()) {
             setError('Please add some data')
             return
+        }
+
+        if (!isAuthenticated) {
+            setError('You must be logged in to save todos.')
+            if (onRequireLogin) onRequireLogin();
+            return;
         }
 
         try {
@@ -80,6 +94,11 @@ const Todo = () => {
     // Above function is works fine but in big projects it is not preferable so we use below method 
 
     const remove = async (id) => {
+        if (!isAuthenticated) {
+            setError('You must be logged in to delete todos.')
+            if (onRequireLogin) onRequireLogin();
+            return;
+        }
         try {
             setError('')
             await todoAPI.deleteTodo(id)
@@ -94,15 +113,28 @@ const Todo = () => {
     }
 
     const edit = (id) => {
+        if (!isAuthenticated) {
+            setError('You must be logged in to edit todos.')
+            if (onRequireLogin) onRequireLogin();
+            return;
+        }
         const itemToEdit = list.find((elem) => {
             return elem._id === id
         })
         setToggle(false)
         setData(itemToEdit.title)
         setEditId(id)
+        setTimeout(() => {
+            inputRef.current && inputRef.current.focus();
+        }, 0);
     }
 
     const removeAll = async () => {
+        if (!isAuthenticated) {
+            setError('You must be logged in to delete todos.')
+            if (onRequireLogin) onRequireLogin();
+            return;
+        }
         try {
             setError('')
             await todoAPI.deleteAllTodos()
@@ -126,45 +158,51 @@ const Todo = () => {
                         <figcaption>Add your list here</figcaption>
                     </figure>
 
-                    {error && <div className='error-message'>{error}</div>}
+                    {isAuthenticated && error && <div className='error-message'>{error}</div>}
 
                     <div className='addItems'>
-                        <input
-                            type="text"
-                            placeholder='✍️ write here'
-                            onChange={inEVe}
-                            value={data}
-                            onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                        />
-                        {
-                            toggle ?
-                                <i className="fa fa-plus add-btn" title='Add Item' onClick={addItem}></i> :
-                                <i className='far fa-edit add-btn' title='Edit Item' onClick={addItem}></i>
-                        }
-                    </div>
-
-                    <div className='showItems'>
-                        {
-                            list.map((currData) => {
-                                return (
-                                    <div className='eachItem' key={currData._id}>
-                                        <h3 style={{ textTransform: 'capitalize' }}>{currData.title}</h3>
-                                        <div className='todo-btn'>
-                                            <i className='far fa-edit add-btn' title='Edit Item' onClick={() => edit(currData._id)}></i>
-                                            <i className='far fa-trash-alt add-btn' title='Delete Item' onClick={() => remove(currData._id)}></i>
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
+                        <div className='addItems-inner'>
+                            <input
+                                type="text"
+                                placeholder='✍️ write here'
+                                onChange={inEVe}
+                                value={data}
+                                onKeyPress={(e) => e.key === 'Enter' && addItem()}
+                                ref={inputRef}
+                            />
+                            {
+                                toggle ?
+                                    <i className="fa fa-plus add-btn" title='Add Item' onClick={addItem}></i> :
+                                    <i className='far fa-edit add-btn' title='Edit Item' onClick={addItem}></i>
+                            }
+                        </div>
                     </div>
 
                     {list.length > 0 && (
-                        <div className='showItems'>
-                            <button className='btn effect04' data-sm-link-text="Remove All" onClick={removeAll}>
-                                <span>CHECK LIST</span>
-                            </button>
-                        </div>
+                        <>
+                            <div className='todo-list-box'>
+                                <div className='showItems'>
+                                    {
+                                        list.map((currData) => {
+                                            return (
+                                                <div className='eachItem' key={currData._id}>
+                                                    <h3 style={{ textTransform: 'capitalize' }} title={currData.title}>{currData.title}</h3>
+                                                    <div className='todo-btn'>
+                                                        <i className='far fa-edit add-btn' title='Edit Item' onClick={() => edit(currData._id)}></i>
+                                                        <i className='far fa-trash-alt add-btn' title='Delete Item' onClick={() => remove(currData._id)}></i>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </div>
+                            <div className='showItems'>
+                                <button className='btn effect04' data-sm-link-text="Remove All" onClick={removeAll}>
+                                    <span>CHECK LIST</span>
+                                </button>
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
