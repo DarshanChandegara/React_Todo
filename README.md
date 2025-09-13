@@ -16,7 +16,7 @@ A modern, secure full-stack todo list application with user authentication, buil
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd todolist-fullstack
+   cd React_Todo
    ```
 
 2. **Install all dependencies**
@@ -46,7 +46,7 @@ Backend API will be available at `http://localhost:5000`
 ## 📁 Project Structure
 
 ```
-todolist-fullstack/
+React_Todo/
 ├── client/                          # React frontend
 │   ├── package.json                # Frontend dependencies
 │   ├── public/
