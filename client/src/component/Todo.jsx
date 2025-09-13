@@ -145,7 +145,7 @@ const Todo = ({ isAuthenticated, onRequireLogin }) => {
         }
     }
 
-    if (loading) {
+    if (loading && isAuthenticated) {
         return <div className='loading'>Loading todos...</div>
     }
 
