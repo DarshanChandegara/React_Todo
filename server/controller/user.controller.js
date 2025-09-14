@@ -46,15 +46,15 @@ const register = async (req, res) => {
     // Set httpOnly cookies for both tokens
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'strict',
+      secure: true, // Always HTTPS in production
+      sameSite: 'none', // Allow cross-domain in production
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'strict',
+      secure: true, // Always HTTPS in production
+      sameSite: 'none', // Allow cross-domain in production
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
@@ -107,15 +107,15 @@ const login = async (req, res) => {
     // Set httpOnly cookies for both tokens
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'strict',
+      secure: true, // Always HTTPS in production
+      sameSite: 'none', // Allow cross-domain in production
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'strict',
+      secure: true, // Always HTTPS in production
+      sameSite: 'none', // Allow cross-domain in production
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
@@ -167,8 +167,8 @@ const refresh = async (req, res) => {
     // Set new httpOnly cookie for access token
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true, // Always HTTPS in production
+      sameSite: 'none', // Allow cross-domain in production
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
