@@ -1,6 +1,5 @@
 {
   "name": "todolist",
-  "homepage": "https://DarshanChandegara.github.io/React_Todo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
