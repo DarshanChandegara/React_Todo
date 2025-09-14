@@ -200,9 +200,17 @@ const logout = async (req, res) => {
       return res.status(400).json({ message: 'Invalid refresh token' });
     }
 
-    // Clear both httpOnly cookies
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    // Clear both httpOnly cookies  
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    });
 
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
